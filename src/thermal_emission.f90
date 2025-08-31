@@ -328,7 +328,7 @@ subroutine repartition_wl_em()
 
   if (lTemp) then
      spectre_emission_cumul(0) = 0.0
-     ! Fonction de répartition émssion
+     ! Fonction de rï¿½partition ï¿½mssion
      do lambda=1,n_lambda
         delta_wl=tab_delta_lambda(lambda)*1.e-6
         spectre_emission_cumul(lambda)=spectre_emission_cumul(lambda-1) + &
@@ -365,7 +365,7 @@ subroutine select_wl_em(aleat,lambda)
 ! Choix de la longueur d'onde dans le corps noir precedemment cree
 ! Dichotomie
 ! lambda est l'indice de la longueur d'onde
-! Utilise les résultats de  repartition_wl_em
+! Utilise les rï¿½sultats de  repartition_wl_em
 ! C. Pinte
 
   implicit none
@@ -481,7 +481,7 @@ subroutine init_reemission(lheating,dudt)
         ! We solve Q+ = int kappa.Jnu.dnu = Q- - extra_heating = int kappa.Bnu.dnu - extra_heating
         ! Here we conpute the extra_heating term
         if (.not.lextra_heating) then
-           ! Energie venant de l'equilibre avec nuage à T_min
+           ! Energie venant de l'equilibre avec nuage ï¿½ T_min
            extra_heating = Qcool0
         else
            if (ldudt_implicit) then
@@ -692,6 +692,8 @@ subroutine Temp_LTE(id, icell, Ti, Temp, frac)
 
         ! Interpolation lineaire entre energies emises pour des
         ! temperatures echantillonees voisines
+
+        ! Potential 1/0 (?)
         frac=(log_Qheat-log_Qcool_minus_extra_heating(Ti-1,p_icell)) / &
              (log_Qcool_minus_extra_heating(Ti,p_icell)-log_Qcool_minus_extra_heating(Ti-1,p_icell))
         Temp=exp(log(tab_Temp(Ti))*frac+log(tab_Temp(Ti-1))*(1.0-frac))
@@ -1758,7 +1760,7 @@ subroutine repartition_energie(lambda)
 ! Calcule la repartition de l'energie emise a la longuer d'onde consideree
 ! entre l'etoile et les differentes cellules du disque
 !  - frac_E_star donne fraction emise par etoile
-!  - prob_E_cell donne la proba d'emission cumulée des cellules
+!  - prob_E_cell donne la proba d'emission cumulï¿½e des cellules
 !  - E_totale donne energie totale emise (pour calibration des images)
 ! Utilise une table de temperature pretabulee
 ! Pour version du code monochromatique avec scattering + em th
@@ -2023,7 +2025,7 @@ end function select_absorbing_grain
 !**********************************************************************
 
 subroutine select_cellule(lambda,aleat, icell)
-  ! Sélection de la cellule qui va émettre le photon
+  ! Sï¿½lection de la cellule qui va ï¿½mettre le photon
   ! C. Pinte
   ! 04/02/05
   ! Modif 3D 10/06/05

@@ -1,0 +1,7 @@
+{
+	"files.exclude": {
+		"**/*.dat": true,
+		"**/*.mod": true,
+		"**/*.o": true
+	}
+}

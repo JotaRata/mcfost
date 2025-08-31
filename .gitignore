@@ -5,6 +5,7 @@
 */*/*~
 *.a
 *.i90
+*.dat
 include/*
 lib/gfortran/lib*
 lib/gfortran/nr/*
@@ -23,6 +24,6 @@ src/web/
 utils/.last_update
 utils/Version
 my_utils/
-
+utils/*
 #parameter files
 *.para

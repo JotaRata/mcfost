@@ -234,9 +234,14 @@ contains
     if (status/=0) correct_Rsub = 1.0
     read(1,*) lhydrostatic
     read(1,*) lchauff_int, alpha
-    T_min= 1.0 ; T_max=3000. ; n_T=100
+    
+    read(1,*) T_min, T_max       ! Requires update to param file
+    read(1,*) lno_internal_energy
+    
+    n_T=100
     if (lchange_Tmax_PAH) T_max = Tmax_PAH
 
+    write(*, *) "Setting T_min = ", T_min, ", T_max = ", T_max
     ! ---------------
     ! Number of zones
     ! ---------------

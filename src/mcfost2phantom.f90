@@ -77,14 +77,17 @@ contains
        SPH_limits = 0.
     endif
 
-    write(*,*) "WARNING: internal heating is turned off in mcfost"
-    lno_internal_energy = .true.
-
     ! Looking for the mcfost utils directory
     call get_mcfost_utils_dir()
 
     ! parameter file
     call read_para(mcfost_para_filename)
+
+   ! lno_internal_energy = .true.
+
+    if (lno_internal_energy) then
+      write(*,*) "WARNING: internal heating is turned off in mcfost"
+    endif
 
     ! Setting option for the mcfost2phantom interface
     ltemp = .true. ; lsed = .false. ; lsed_complete = .false.
