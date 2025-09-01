@@ -37,6 +37,11 @@ contains
     write(*,*)
     write(*,*) "You are running MCFOST "//trim(mcfost_release)
     write(*,*) "Git SHA = ", sha_id
+    write(*,*) "------------------------------"
+    write(*,*) "WARNING: This version of MCFOST was modified, the results obtained could be non-physical"
+    write(*,*) "- The parameter file is not compatible with the original version of MCFOST"
+    write(*,*) "- The commit of MCFOST used to build is outdated"
+
 
     ! Global logical variables
     call set_default_variables()
