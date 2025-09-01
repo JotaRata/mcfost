@@ -201,6 +201,7 @@ module parametres
 
   real :: exp_strat, a_strat
   real :: alpha
+  real :: heating_multiplier
 
   ! Description analytique du puffed-up inner rim
   logical :: lpuffed_rim

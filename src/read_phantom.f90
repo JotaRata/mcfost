@@ -974,6 +974,11 @@ contains
     if (.not.lno_internal_energy) then
        if (ndudt == np) then
           write(*,*) "Computing energy input"
+          
+          if (abs(heating_multiplier - 1.0_dp) > tiny_dp) then
+            write(*,*) "WARNING; Heating multiplier is ", heating_multiplier, "x"
+          endif
+
           lextra_heating = .true.
           allocate(extra_heating(n_SPH), stat=alloc_status)
           if (alloc_status /=0) call error("Allocation error in phantom_2_mcfost")
@@ -982,11 +987,15 @@ contains
           do i=1,n_SPH
              qtermi = dudt(particle_id(i)) * uWatt
              totlum = totlum + qtermi
-             extra_heating(i) = qtermi
+             extra_heating(i) = qtermi * heating_multiplier
           enddo
 
           write(*,*) "Total energy input = ",real(totlum),' W'
           write(*,*) "Total energy input = ",real(totlum/Lsun),' Lsun'
+
+          if (abs(heating_multiplier - 1.0_dp) > tiny_dp) then
+            write(*,*) "Total energy input (scaled) = ",real(heating_multiplier * totlum/Lsun),' Lsun'
+          endif
        endif
 
        ufac_implicit = 0.

@@ -237,6 +237,7 @@ contains
     
     read(1,*) T_min, T_max       ! Requires update to param file
     read(1,*) lno_internal_energy
+    read(1,*) heating_multiplier
     
     n_T=100
     if (lchange_Tmax_PAH) T_max = Tmax_PAH
