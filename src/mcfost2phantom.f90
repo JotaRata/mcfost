@@ -41,6 +41,7 @@ contains
     write(*,*) "WARNING: This version of MCFOST was modified, the results obtained could be non-physical"
     write(*,*) "- The parameter file is not compatible with the original version of MCFOST"
     write(*,*) "- The commit of MCFOST used to build is outdated"
+    write(*,*) "Dark zone tau threshold: ", tau_dark_zone_obs
 
 
     ! Global logical variables
@@ -186,6 +187,7 @@ contains
     use grid,only : setup_grid
     use scattering, only : setup_scattering
     use optical_depth, only : no_dark_zone, integ_tau, opacite
+    use cylindrical_grid, only: l_dark_zone
     use wavelengths, only : n_lambda, tab_lambda
     use Temperature, only : Tdust
     use mcfost_env
@@ -345,7 +347,8 @@ contains
     write(*,*) "lambda =", real(tab_lambda(lambda_seuil))
     call integ_tau(lambda_seuil)
 
-    write(*,*) "Computing temperature structure ..."
+    write(*,*) "Are dark zones disabled for all cells?: ", .not.ANY(l_dark_zone)
+    write(*,*) "Computing temperature structure ... this may take a *while*"
     ! Making the MC run
     if (laffichage) call progress_bar(0)
     !$omp parallel &

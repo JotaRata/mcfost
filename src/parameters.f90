@@ -23,7 +23,7 @@ module parametres
   real(kind=dp) :: E_paquet
   integer :: n_dif_max_eq_th = 100000 ! Nbre max de dif autorises dans calcul eq. th OUTDATED
   real :: tau_dark_zone_eq_th = 1500 !1500.   15000 pour benchmark a tau=1e6
-  real :: tau_dark_zone_obs = 100 ! idem que 1000 si 1500. ci-dessus
+  real :: tau_dark_zone_obs = 1.e6 ! idem que 1000 si 1500. ci-dessus
   integer :: n_Stokes
 
   ! Nbre d'angles pour echantillonner la fct de phase
