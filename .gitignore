@@ -27,3 +27,4 @@ my_utils/
 utils/*
 #parameter files
 *.para
+old_version

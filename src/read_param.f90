@@ -149,7 +149,7 @@ contains
     nbre_photons_tot=real(nbre_photons_loop)*real(nbre_photons_eq_th)
 
     tau_seuil  = 1.0e31
-    wl_seuil = 0.81
+    wl_seuil = 100
 
     ! ----------
     ! Wavelength

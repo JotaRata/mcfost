@@ -173,7 +173,7 @@ contains
     use parametres
     use constantes, only : mu
     use read_phantom
-    use stars, only : E_ISM
+    use stars, only : E_ISM, spectre_etoiles
     use radiation_field, only : xN_abs
     use thermal_emission, only : select_wl_em, repartition_energie, init_reemission, &
          temp_finale, temp_finale_nlte, repartition_wl_em, set_min_temperature, E_abs_nRE
@@ -244,6 +244,8 @@ contains
     logical :: lpacket_alive, lintersect, laffichage, flag_star, flag_scatt, flag_ISM, ldust_moments
     integer, target :: lambda, lambda0
     integer, pointer, save :: p_lambda
+
+    integer :: peak_lambda
 
     logical, save :: lfirst_time = .true.
 
@@ -344,10 +346,23 @@ contains
           exit test_tau
        endif
     enddo test_tau
-    write(*,*) "lambda =", real(tab_lambda(lambda_seuil))
-    call integ_tau(lambda_seuil)
 
-    write(*,*) "Are dark zones disabled for all cells?: ", .not.ANY(l_dark_zone)
+    write(*,*) "Using λ =", real(tab_lambda(lambda_seuil))
+    call integ_tau(lambda_seuil)
+    write(*,'(A)') ""
+
+    ! Compute peak wavelength of the star(s)
+    peak_lambda = 1
+    wl_test : do lambda = 1, n_lambda
+      if (spectre_etoiles(lambda) > spectre_etoiles(peak_lambda)) then
+         peak_lambda = lambda
+      endif
+    enddo wl_test
+
+    write(*,*) "Peak wavelength: ", tab_lambda(peak_lambda)
+    call integ_tau(peak_lambda)
+
+    write(*,*) "-----------------------------------------------------------"
     write(*,*) "Computing temperature structure ... this may take a *while*"
     ! Making the MC run
     if (laffichage) call progress_bar(0)

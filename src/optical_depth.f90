@@ -211,33 +211,34 @@ subroutine integ_tau(lambda)
   !do i=1, n_rad
   !   tau=tau+kappa(cell_map(i,1,1),lambda)*(r_lim(i)-r_lim(i-1))
   !enddo
-  write(*,*) 'Integ tau dans plan eq. = ', tau
-
+  write(*, '("Integrated tau along the x-direction (eq. plane): ",E12.5," at λ = ",f4.2," μm")') tau, tab_lambda(lambda)
+  write(*,'("  Path length: ",f4.2," AU")') lmax
+  
   if (.not.lvariable_dust) then
      icell = icell_not_empty
      if (kappa(icell1,lambda) * kappa_factor(icell) > tiny_real) then
-        write(*,*) " Column density (g/cm^2)   = ", real(tau*(masse(icell)/(volume(icell)*AU_to_cm**3))/ &
+        write(*,'("  Column density: ",E12.5," g/cm^2")') real(tau*(masse(icell)/(volume(icell)*AU_to_cm**3))/ &
              (kappa(icell1,lambda) * kappa_factor(icell)/AU_to_cm))
      endif
   endif
 
-  Stokes = 0.0_dp ; Stokes(1) = 1.0_dp
-  w0 = cos((angle)*pi/180.)
-  u0 = sqrt(1.0-w0*w0)
-  v0 = 0.0
-
-  call indice_cellule(x0,y0,z0, icell)
-  call optical_length_tot(1,lambda,Stokes,icell,x0,y0,z0,u0,v0,w0,tau,lmin,lmax)
-
-  write(*,fmt='(" Integ tau (i =",f4.1," deg)   = ",E12.5)') angle, tau
-
-  if (.not.lvariable_dust) then
-     icell = icell_not_empty
-     if (kappa(icell1,lambda) * kappa_factor(icell) > tiny_real) then
-        write(*,*) " Column density (g/cm^2)   = ", real(tau*(masse(icell)/(volume(icell)*AU_to_cm**3))/ &
-             (kappa(icell1,lambda) * kappa_factor(icell)/AU_to_cm))
-     endif
-  endif
+!  Stokes = 0.0_dp ; Stokes(1) = 1.0_dp
+!  w0 = cos((angle)*pi/180.)
+!  u0 = sqrt(1.0-w0*w0)
+!  v0 = 0.0
+!
+!  call indice_cellule(x0,y0,z0, icell)
+!  call optical_length_tot(1,lambda,Stokes,icell,x0,y0,z0,u0,v0,w0,tau,lmin,lmax)
+!
+!  write(*,'("Integrated tau at (i =",f4.1," deg) from z-axis = ",E12.5," at λ = ",f4.2," μm")') angle, tau, tab_lambda(lambda)
+!
+!  if (.not.lvariable_dust) then
+!     icell = icell_not_empty
+!     if (kappa(icell1,lambda) * kappa_factor(icell) > tiny_real) then
+!        write(*,'("  Column density: ",E12.5," g/cm^2")') real(tau*(masse(icell)/(volume(icell)*AU_to_cm**3))/ &
+!             (kappa(icell1,lambda) * kappa_factor(icell)/AU_to_cm))
+!     endif
+!  endif
 
   return
 
