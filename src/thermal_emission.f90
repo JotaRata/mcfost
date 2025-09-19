@@ -899,9 +899,12 @@ subroutine Temp_finale()
   if (maxval(Tdust) > T_max) then
      write(*,*) "WARNING : temperature > sublimation temperature"
      write(*,*) "WARNING : temperature = ", maxval(Tdust)
-  else
-     write(*,*) "Max. temperature = ", maxval(Tdust)
   endif
+  
+  write(*,'("---------------------------------------")')
+  write(*,'("Temperature min:  ",f10.3," K")')  minval(Tdust)
+  write(*,'("Temperature max:  ",f10.3," K")')  maxval(Tdust)
+  write(*,'("Temperature mean: ",f10.3," K")') sum(Tdust) / real(n_cells)
 
   return
 

@@ -197,6 +197,8 @@ subroutine integ_tau(lambda)
   real(kind=dp) :: x0, y0, z0, u0, v0, w0
   real :: tau
   real(kind=dp) :: lmin, lmax
+  real(kind=dp) :: lmean, fpmean
+  real :: n_steps
 
   angle=angle_interet
 
@@ -205,14 +207,17 @@ subroutine integ_tau(lambda)
   w0 = 0.0 ; u0 = 1.0 ; v0 = 0.0
 
   call indice_cellule(x0,y0,z0, icell)
-  call optical_length_tot(1,lambda,Stokes,icell,x0,y0,z0,u0,v0,w0,tau,lmin,lmax)
+  call optical_length_tot(1,lambda,Stokes,icell,x0,y0,z0,u0,v0,w0,tau,lmin,lmax, n_steps,lmean,fpmean)
 
   !tau = 0.0
   !do i=1, n_rad
   !   tau=tau+kappa(cell_map(i,1,1),lambda)*(r_lim(i)-r_lim(i-1))
   !enddo
-  write(*, '("Integrated tau along the x-direction (eq. plane): ",E12.5," at λ = ",f4.2," μm")') tau, tab_lambda(lambda)
-  write(*,'("  Path length: ",f4.2," AU")') lmax
+  write(*, '("Integrated tau along the x-direction (eq. plane): ",E12.5," at λ = ",f6.2," μm")') tau, tab_lambda(lambda)
+  write(*,'("  Total path length: ",E10.3," cm")') lmax * au_to_cm
+  write(*,'("  Mean cell length:  ",E10.3," cm")') lmean * au_to_cm
+  write(*,'("  Mean free path:    ",E10.3," cm (avg)")') fpmean * au_to_cm
+  write(*,'("  Number of steps:   ",F10.0)') n_steps
   
   if (.not.lvariable_dust) then
      icell = icell_not_empty
@@ -246,7 +251,7 @@ end subroutine integ_tau
 
 !***********************************************************
 
-subroutine optical_length_tot(id,lambda,Stokes,icell,xi,yi,zi,u,v,w,tau_tot_out,lmin,lmax)
+subroutine optical_length_tot(id,lambda,Stokes,icell,xi,yi,zi,u,v,w,tau_tot_out,lmin,lmax, n_steps,lmean,fpmean)
 ! Integration par calcul de la position de l'interface entre cellules
 ! de l'opacite totale dans une direction donnée
 ! Grille a geometrie cylindrique
@@ -268,6 +273,9 @@ subroutine optical_length_tot(id,lambda,Stokes,icell,xi,yi,zi,u,v,w,tau_tot_out,
   integer, target :: icell0
   integer, pointer :: p_icell
 
+  real, optional, intent(out):: n_steps
+  real(kind=dp), optional, intent(out) :: lmean, fpmean ! in AU
+
   correct_plus = 1.0_dp + prec_grille
   correct_moins = 1.0_dp - prec_grille
 
@@ -277,6 +285,7 @@ subroutine optical_length_tot(id,lambda,Stokes,icell,xi,yi,zi,u,v,w,tau_tot_out,
 
   lmin=0.0_dp
   ltot=0.0_dp
+  n_steps=0.0
 
   next_cell = icell
   icell0 = 0 ! for previous_cell, just for Voronoi
@@ -298,14 +307,29 @@ subroutine optical_length_tot(id,lambda,Stokes,icell,xi,yi,zi,u,v,w,tau_tot_out,
      if (test_exit_grid(icell0, x0, y0, z0)) then
         tau_tot_out=tau_tot
         lmax=ltot
-        return
+        if (present(lmean)) then
+            lmean = ltot / n_steps
+        endif
+        if (present(fpmean)) then
+            fpmean = fpmean / n_steps
+        endif
+
+        RETURN
      endif
 
      if (icell0 <= n_cells) then
-        opacite = kappa(p_icell,lambda) * kappa_factor(icell0)
+        opacite = kappa(p_icell,lambda) * kappa_factor(icell0) ! this is alpha = kappa * fac [1/AU]
+
+      if (present(fpmean)) then
+         if (opacite > tiny_dp) then
+            fpmean = fpmean + 1 / opacite ! [AU]
+         endif
+      endif
+
      else
         opacite = 0.0_dp
      endif
+
 
      ! Calcul longeur de vol et profondeur optique dans la cellule
      call cross_cell(x0,y0,z0, u,v,w,  icell0, previous_cell, x1,y1,z1, next_cell, l, l_contrib, l_void_before)
@@ -314,8 +338,9 @@ subroutine optical_length_tot(id,lambda,Stokes,icell,xi,yi,zi,u,v,w,tau_tot_out,
 
      tau_tot = tau_tot + tau
      ltot= ltot + l
-
      if (tau_tot < tiny_real) lmin=ltot
+
+     n_steps = n_steps + 1.0
 
   enddo ! boucle infinie
 

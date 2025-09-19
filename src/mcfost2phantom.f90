@@ -173,7 +173,7 @@ contains
     use parametres
     use constantes, only : mu
     use read_phantom
-    use stars, only : E_ISM, spectre_etoiles
+    use stars, only : E_ISM, E_stars
     use radiation_field, only : xN_abs
     use thermal_emission, only : select_wl_em, repartition_energie, init_reemission, &
          temp_finale, temp_finale_nlte, repartition_wl_em, set_min_temperature, E_abs_nRE
@@ -225,8 +225,6 @@ contains
     real(sp), dimension(np), intent(out) :: n_packets ! number of packets that crossed the cell
     real(dp), intent(out) :: mu_gas
     integer, intent(out) :: ierr
-
-    real, parameter :: Tmin = 1.
 
     real(dp), dimension(:), allocatable :: x_SPH,y_SPH,z_SPH,h_SPH,rhogas, massgas, vx_SPH,vy_SPH,vz_SPH, SPH_grainsizes
     real(dp), dimension(:), allocatable :: Tgas_SPH
@@ -352,13 +350,7 @@ contains
     write(*,'(A)') ""
 
     ! Compute peak wavelength of the star(s)
-    peak_lambda = 1
-    wl_test : do lambda = 1, n_lambda
-      if (spectre_etoiles(lambda) > spectre_etoiles(peak_lambda)) then
-         peak_lambda = lambda
-      endif
-    enddo wl_test
-
+    peak_lambda = maxloc(E_stars, dim=1)
     write(*,*) "Peak wavelength: ", tab_lambda(peak_lambda)
     call integ_tau(peak_lambda)
 
@@ -393,7 +385,7 @@ contains
 
           ! Emission du paquet
           call emit_packet(id,lambda, icell,x,y,z,u,v,w,stokes,flag_star,flag_ISM,lintersect)
-          Stokes = 0.0_dp ; Stokes(1) = 1.0_dp
+          Stokes = 0.0_dp ; Stokes(1) = 1.0_dp       ! E_paquet is already 1.0 except for the case nRE
           lpacket_alive = .true.
 
           ! Propagation du packet
@@ -428,7 +420,7 @@ contains
        ! TBD
     endif
 
-    call set_min_Temperature(Tmin)
+    call set_min_Temperature(T_min)
 
     if (present(write_T_files)) then
        if (write_T_files) call write_mcfost2phantom_temperature()
