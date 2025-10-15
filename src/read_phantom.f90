@@ -1130,6 +1130,7 @@ contains
           etoile(i_etoile)%vz = vxyz_ptmass(3,i_etoile) * uvelocity
 
           etoile(i_etoile)%M = xyzmh_ptmass(4,i_etoile) * usolarmass
+          ! BUG: Mdot is not set for the case of Fixed parameters
        enddo
     else
 

@@ -215,8 +215,8 @@ subroutine integ_tau(lambda)
   !enddo
   write(*, '("Integrated tau along the x-direction (eq. plane): ",E12.5," at λ = ",f6.2," μm")') tau, tab_lambda(lambda)
   write(*,'("  Total path length: ",E10.3," cm")') lmax * au_to_cm
-  write(*,'("  Mean cell length:  ",E10.3," cm")') lmean * au_to_cm
-  write(*,'("  Mean free path:    ",E10.3," cm (avg)")') fpmean * au_to_cm
+  write(*,'("  Mean cell length:  ",E10.3," cm (avg 0.5<R<1)")') lmean * au_to_cm
+  write(*,'("  Mean free path:    ",E10.3," cm (avg 0.5<R<1)")') fpmean * au_to_cm
   write(*,'("  Number of steps:   ",F10.0)') n_steps
   
   if (.not.lvariable_dust) then
@@ -275,6 +275,7 @@ subroutine optical_length_tot(id,lambda,Stokes,icell,xi,yi,zi,u,v,w,tau_tot_out,
 
   real, optional, intent(out):: n_steps
   real(kind=dp), optional, intent(out) :: lmean, fpmean ! in AU
+  real(kind=dp) :: r
 
   correct_plus = 1.0_dp + prec_grille
   correct_moins = 1.0_dp - prec_grille
@@ -308,7 +309,7 @@ subroutine optical_length_tot(id,lambda,Stokes,icell,xi,yi,zi,u,v,w,tau_tot_out,
         tau_tot_out=tau_tot
         lmax=ltot
         if (present(lmean)) then
-            lmean = ltot / n_steps
+            lmean = lmean / n_steps
         endif
         if (present(fpmean)) then
             fpmean = fpmean / n_steps
@@ -320,10 +321,13 @@ subroutine optical_length_tot(id,lambda,Stokes,icell,xi,yi,zi,u,v,w,tau_tot_out,
      if (icell0 <= n_cells) then
         opacite = kappa(p_icell,lambda) * kappa_factor(icell0) ! this is alpha = kappa * fac [1/AU]
 
+      r = sqrt(x0**2 + y0**2)
       if (present(fpmean)) then
-         if (opacite > tiny_dp) then
-            fpmean = fpmean + 1 / opacite ! [AU]
-         endif
+        if (r < 1 .and. r > 0.5)  then
+            if (opacite > tiny_dp) then
+               fpmean = fpmean + 1 / opacite ! [AU]
+            endif
+        endif
       endif
 
      else
@@ -339,6 +343,12 @@ subroutine optical_length_tot(id,lambda,Stokes,icell,xi,yi,zi,u,v,w,tau_tot_out,
      tau_tot = tau_tot + tau
      ltot= ltot + l
      if (tau_tot < tiny_real) lmin=ltot
+
+      if (present(lmean)) then
+        if (r < 1 .and. r > 0.5)  then
+            lmean = lmean + l ! [AU]
+        endif
+      endif
 
      n_steps = n_steps + 1.0
 

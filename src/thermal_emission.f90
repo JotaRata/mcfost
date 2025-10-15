@@ -901,14 +901,42 @@ subroutine Temp_finale()
      write(*,*) "WARNING : temperature = ", maxval(Tdust)
   endif
   
-  write(*,'("---------------------------------------")')
-  write(*,'("Temperature min:  ",f10.3," K")')  minval(Tdust)
-  write(*,'("Temperature max:  ",f10.3," K")')  maxval(Tdust)
-  write(*,'("Temperature mean: ",f10.3," K")') sum(Tdust) / real(n_cells)
-
+  ! Print temperature inside an annulus of 0.5 AU to 1 AU
+   call temperature_annulus(0.5, 1.0)
   return
 
 end subroutine Temp_finale
+
+subroutine temperature_annulus(rmin, rmax)
+   implicit none
+   real, intent(in) :: rmin, rmax
+   integer :: icell
+   real :: Tmean, Tmin, Tmax, T
+   real :: n_steps
+   real(kind=dp), dimension(3) :: pos
+   real(kind=dp) :: r
+
+   Tmean = 0.0; Tmin = huge_real; Tmax = 0.0; n_steps= 0.0
+   do icell=1, n_cells
+      pos = Voronoi(icell)%xyz
+      r = pos(1)**2 + pos(2)**2
+      if (r > rmin**2 .and. r < rmax**2) then
+         n_steps = n_steps + 1.0
+         T = Tdust(icell)
+
+         Tmean = Tmean + T
+         if (T > Tmax) Tmax = T
+         if (T < Tmin) Tmin = T
+      endif
+   enddo
+   Tmean = Tmean / n_steps
+
+   write(*,'("Temperature inside annulus:", f6.2, "< R <", f6.2)') rmin, rmax
+   write(*,'("- Min:  ",f10.3," K")')  Tmin
+   write(*,'("- Max:  ",f10.3," K")')  Tmax
+   write(*,'("- Mean: ",f10.3," K")')  Tmean
+   write(*,'("- N Cells: ", i6)') int(n_steps)
+end subroutine temperature_annulus
 
 !**********************************************************************
 
